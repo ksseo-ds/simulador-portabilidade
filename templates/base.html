@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+
+    <title>{% block title %}Simulador de Empréstimo{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+</head>
+
+<body class="bg-dark text-light">
+    {% include "navigation.html" %}
+
+    <main class="container mt-5">
+    <h1 class="text-center mb-4">Simulador de Portabilidade</h1>
+    </main>    
+    {% block content %}{% endblock %}
+    
+</body>
+</html>

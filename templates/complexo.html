@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Simulador de Portabilidade com Troco{% endblock %}
+
+{% block content %}
+<form action="/complexo" method="post" id="form-portabilidade">
+    <!-- Nova operação -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Parcela total a consignar (Renovados + Margem):</label>
+            <small class="text-muted d-block mb-1">Parcela dos contratos renovados mais a margem que vai usar.</small>
+            <input type="number" name="nova_parcela" class="form-control" step="0.01" required value="{{ nova_parcela if nova_parcela is defined }}">
+        </div>
+        <div class="col-md-6">
+            <label>Prazo (meses):</label>
+            <small class="text-muted d-block mb-1">Prazo total da renovação</small>
+            <input type="number" name="prazo" class="form-control" required value="{{ prazo if prazo is defined }}">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Taxa de Juros mensal (%):</label>
+            <small class="text-muted d-block mb-1">Taxa da menor operação</small>
+            <input type="number" step="0.01" name="juros" class="form-control" required value="{{ juros if juros is defined }}">
+        </div>
+        <div class="col-md-6">
+            <label>Data do 1º Pagamento:</label>
+            <small class="text-muted d-block mb-1">Atentar para o prazo de carência</small>
+            <input type="date" name="data_pagamento" class="form-control" required value="{{ data_pagamento if data_pagamento is defined }}">
+        </div>
+    </div>
+
+    <!-- Contratos -->
+    <div id="contratos">
+        {% if dados_contratos %}
+            {% for c in dados_contratos %}
+            <div class="contrato mb-3 border p-2 rounded">
+                <h5>Contrato</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Numero do Contrato</label>
+                        <input type="text" name="num_contrato" class="form-control" value="{{ c.num_contrato }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Banco Nome</label>
+                        <input type="text" name="nome_banco" class="form-control" value="{{ c.nome_banco }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Parcela:</label>
+                        <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value="{{ c.parcela }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Saldo Devedor:</label>
+                        <input type="number" name="saldos" class="form-control" step="0.01" required value="{{ c.saldo }}">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="contrato mb-3 border p-2 rounded">
+            <h5>Contrato</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Numero do Contrato</label>
+                    <input type="text" name="num_contrato" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label>Banco Nome</label>
+                    <input type="text" name="nome_banco" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label>Parcela R$:</label>
+                    <input type="number" name="valor_parcelas" class="form-control" step="0.01" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Saldo Devedor R$:</label>
+                    <input type="number" name="saldos" class="form-control" step="0.01" required>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Botões -->
+    <div class="mb-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" onclick="adicionarContrato()">Adicionar Contrato</button>
+        <a href="{{ url_for('complexo') }}" class="btn btn-danger">
+            🧹 Limpar Tudo
+        </a>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Calcular Troco</button>
+</form>
+
+<!-- RESULTADO FINAL -->
+{% if resultado %}
+<div class="alert alert-success mt-4">
+    <h4>Resultado</h4>
+    <p><strong>Parcela total a consignar:</strong> R$ {{ nova_parcela }}</p>
+    <p><strong>Valor Financiado (com IOF):</strong> R$ {{ resultado.valor_total }}</p>
+    <p><strong>IOF:</strong> R$ {{ resultado.iof }}</p>
+    <p><strong>Juros de carência:</strong> R$ {{ resultado.juros_carencia }}</p>
+    <p><strong>Troco líquido liberado:</strong> R$ {{ resultado.troco_liquido }}</p>
+    {% if dados_contratos %}
+    <hr>
+    <h5>Contratos Informados:</h5>
+    <ul>
+        {% for c in dados_contratos %}
+          <li>
+            Banco: {{ c.nome_banco }} | Nº: {{ c.num_contrato }} | Parcela: R$ {{ c.parcela }} | Saldo: R$ {{ c.saldo }}
+          </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- SCRIPTS -->
+<script>
+function adicionarContrato() {
+    const container = document.getElementById("contratos");
+    const novo = document.createElement("div");
+    novo.classList.add("contrato", "mb-3", "border", "p-2", "rounded");
+
+    novo.innerHTML = `
+        <h5>Contrato</h5>
+        <div class="row">
+            <div class="col-md-3">
+                <label>Numero do Contrato</label>
+                <input type="text" name="num_contrato" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>Banco Nome</label>
+                <input type="text" name="nome_banco" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>Parcela:</label>
+                <input type="number" name="valor_parcelas" class="form-control" step="0.01" required>
+            </div>
+            <div class="col-md-3">
+                <label>Saldo Devedor:</label>
+                <input type="number" name="saldos" class="form-control" step="0.01" required>
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
+    `;
+    container.appendChild(novo);
+}
+
+function removerContrato(botao) {
+    const contrato = botao.closest(".contrato");
+    contrato.remove();
+}
+</script>
+{% endblock %}
