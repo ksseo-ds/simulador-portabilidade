@@ -11,8 +11,8 @@ class OperacaoPortabilidade:
     
     '''
     
-    def __init__(self, nova_parcela:Decimal, prazo, juros_mensal:Decimal, data_pagamento, saldos:Decimal, parcelas:int):
-        self.nova_parcela = Decimal(nova_parcela)
+    def __init__(self, nova_parcela:Decimal, prazo, juros_mensal:Decimal, data_pagamento, saldos:Decimal, parcelas):
+        self.nova_parcela = Decimal(nova_parcela + sum(parcelas))
         self.prazo = prazo
         self.juros_mensal = Decimal(juros_mensal) / Decimal(100)
         self.data_pagamento = data_pagamento

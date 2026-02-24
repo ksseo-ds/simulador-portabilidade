@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('resultado.html')
+    return render_template('complexo.html')
 
 @app.route('/complexo', methods=['GET','POST'])
 def complexo():
@@ -118,7 +118,7 @@ def calcular():
         'complexo.html',
         dados_contratos=dados_contratos,
         resultado=resultado,
-        nova_parcela=nova_parcela,
+        nova_parcela=50000,
         prazo=prazo,
         juros=juros,
         data_pagamento=data_pagamento_str,
@@ -126,4 +126,4 @@ def calcular():
     )
 
 if __name__ == '__main__':
-    app.run(host ="0.0.0.0", port=5000)
+    app.run(host ="0.0.0.0", port=5000, debug=True)
