@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('resultado.html')
+    return render_template('complexo.html')
 
 @app.route('/complexo', methods=['GET','POST'])
 def complexo():
@@ -31,7 +31,7 @@ def complexo():
 
             # cria a operação lá na Calculadora
             operacao = OperacaoPortabilidade(
-                nova_parcela=nova_parcela,
+                ajuste_margem=nova_parcela,
                 prazo=prazo,
                 juros_mensal=juros,
                 data_pagamento=data_pagamento,
@@ -41,7 +41,7 @@ def complexo():
 
             resultado = operacao.calcular_troco()
             contratos = list(zip(parcelas, saldos)) # necessário para não apagar os dados preenchidos dos contratos adicionados
-
+            
             
             for banco, contrato, parcela, saldo in zip(nomes_bancos, num_contratos, parcelas, saldos ):
                 dados_contratos.append(
@@ -60,7 +60,8 @@ def complexo():
         'complexo.html',
         dados_contratos=dados_contratos,
         resultado=resultado,
-        nova_parcela=nova_parcela,
+        nova_parcela = nova_parcela,
+        parcela_total = nova_parcela + sum(parcelas),
         prazo=prazo,
         juros=juros,
         data_pagamento=data_pagamento_str,
@@ -89,7 +90,7 @@ def calcular():
 
             # cria a operação lá na Calculadora
             operacao = OperacaoPortabilidade(
-                nova_parcela=nova_parcela,
+                ajuste_margem=nova_parcela,
                 prazo=prazo,
                 juros_mensal=juros,
                 data_pagamento=data_pagamento,
@@ -126,4 +127,4 @@ def calcular():
     )
 
 if __name__ == '__main__':
-    app.run(host ="0.0.0.0", port=5000)
+    app.run(host ="0.0.0.0", port=5000, debug=True)
