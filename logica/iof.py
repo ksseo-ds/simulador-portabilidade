@@ -20,3 +20,6 @@ def calcular_iof(prazo_meses: int, valor_base: Decimal) -> Decimal:
     print(iof_coef)
 
     return  iof
+#todo alterar o código do IOF para pegar um percentual do que seria o IOF em cima do valor base e recalcular o IOF final para esse percentual, isso evita da soma do IOF com o valor base superar o máximo.
+
+#todo Efetuar o calculo esperado de amortização de capital para calcular IOF decrescente
