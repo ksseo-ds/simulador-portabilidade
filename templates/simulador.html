@@ -3,7 +3,7 @@
 {% block title %}Simulador de Portabilidade com Troco{% endblock %}
 
 {% block content %}
-<form action="/complexo" method="post" id="form-portabilidade">
+<form action="{{url_for('simulador_portabilidade')}}" method="post" id="form-portabilidade">
     <!-- Nova operação -->
     <div class="row mb-3">
         <div class="col-md-6">
@@ -89,7 +89,7 @@
     <!-- Botões -->
     <div class="mb-3 d-flex justify-content-between">
         <button type="button" class="btn btn-secondary" onclick="adicionarContrato()">Adicionar Contrato</button>
-        <a href="{{ url_for('complexo') }}" class="btn btn-danger">
+        <a href="{{ url_for('simulador_portabilidade') }}" class="btn btn-danger">
             🧹 Limpar Tudo
         </a>
     </div>
