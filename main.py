@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from logica.calculadora import OperacaoPortabilidade
-from datetime import datetime
+from datetime import datetime,timedelta
 from decimal import Decimal
 
 
@@ -17,6 +17,7 @@ def simulador_portabilidade():
     contratos = []
     dados_contratos=[]
     parcelas = []
+    carencia_padrao = datetime.today().date() + timedelta(days=30)
 
     if nova_parcela is not None:
         parcela_total = nova_parcela + sum(parcelas)
@@ -72,7 +73,8 @@ def simulador_portabilidade():
         prazo=prazo,
         juros=juros,
         data_pagamento=data_pagamento_str,
-        contratos=contratos
+        contratos=contratos,
+        carencia_padrao = carencia_padrao
     )
 
 

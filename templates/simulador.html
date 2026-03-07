@@ -9,15 +9,14 @@
         <div class="col-md-6">
             <label>Ajuste de Margem:</label>
             <small class="text-muted d-block mb-1">altere o valor para usar margem livre ou diminuir com margem negativa, ex: -200</small>
-            <input type="number" name="nova_parcela" id ="nova_parcela" class="form-control" step="0.01" required value="{{ nova_parcela if nova_parcela is defined }}" oninput="calcularParcelaTotal()">
-            <p>nova parcela = [{{nova_parcela}}]</p>
-            <span id ="parcela_total"> Parcela total a Consignar: R$ {{ parcela_total if parcela_total is defined else "0,00"}} </span>
+            <input type="number" name="nova_parcela" id ="nova_parcela" class="form-control" step="0.01" required value="{{ nova_parcela if nova_parcela is not none else 0.00 }}" oninput="calcularParcelaTotal()">
+            <span id ="parcela_total"> Parcela total a Consignar: R$ {{ parcela_total if parcela_total is not none else "0,00"}} </span>
 
         </div>
         <div class="col-md-6">
             <label>Prazo (meses):</label>
             <small class="text-muted d-block mb-1">Prazo total da renovação</small>
-            <input type="number" name="prazo" class="form-control" required value="{{ prazo if prazo is defined }}">
+            <input type="number" name="prazo" class="form-control" required value="{{ prazo if prazo is not none else 120 }}">
         </div>
     </div>
 
@@ -25,15 +24,15 @@
         <div class="col-md-6">
             <label>Taxa de Juros mensal (%):</label>
             <small class="text-muted d-block mb-1">Taxa da menor operação</small>
-            <input type="number" step="0.01" name="juros" class="form-control" required value="{{ juros if juros is defined }}">
+            <input type="number" step="0.01" name="juros" class="form-control" required value="{{ juros if juros is not none else 1.5}}">
         </div>
         <div class="col-md-6">
             <label>Data do 1º Pagamento:</label>
             <small class="text-muted d-block mb-1">Atentar para o prazo de carência</small>
-            <input type="date" name="data_pagamento" class="form-control" required value="{{ data_pagamento if data_pagamento is defined }}">
+            <input type="date" name="data_pagamento" class="form-control" required value="{{ data_pagamento if data_pagamento is not none else carencia_padrao}}">
         </div>
     </div>
-
+ 
     <!-- Contratos -->
     <div id="contratos">
         {% if dados_contratos %}
@@ -50,17 +49,18 @@
                         <input type="text" name="nome_banco" class="form-control" value="{{ c.nome_banco }}">
                     </div>
                     <div class="col-md-3">
-                        <label>Parcela:</label>
+                        <label>Parcela R$:</label>
                         <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value="{{ c.parcela }}" oninput="calcularParcelaTotal()">
                     </div>
                     <div class="col-md-3">
-                        <label>Saldo Devedor:</label>
+                        <label>Saldo Devedor R$:</label>
                         <input type="number" name="saldos" class="form-control" step="0.01" required value="{{ c.saldo }}">
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
             </div>
             {% endfor %}
+            <!-- Aqui entra no Else, essa parte é importante pra receber dados pra persistirem valores padrão antes da primeira simulação -->
         {% else %}
         <div class="contrato mb-3 border p-2 rounded">
             <h5>Contrato</h5>
@@ -75,11 +75,11 @@
                 </div>
                 <div class="col-md-3">
                     <label>Parcela R$:</label>
-                    <input type="number" name="valor_parcelas" class="form-control" step="0.01" required>
+                    <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0>
                 </div>
                 <div class="col-md-3">
                     <label>Saldo Devedor R$:</label>
-                    <input type="number" name="saldos" class="form-control" step="0.01" required>
+                    <input type="number" name="saldos" class="form-control" step="0.01" required value= 0>
                 </div>
             </div>
             <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
@@ -140,12 +140,12 @@ function adicionarContrato() {
                 <input type="text" name="nome_banco" class="form-control">
             </div>
             <div class="col-md-3">
-                <label>Parcela:</label>
-                <input type="number" name="valor_parcelas" class="form-control" step="0.01" required>
+                <label>Parcela R$:</label>
+                <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0>
             </div>
             <div class="col-md-3">
-                <label>Saldo Devedor:</label>
-                <input type="number" name="saldos" class="form-control" step="0.01" required>
+                <label>Saldo Devedor R$:</label>
+                <input type="number" name="saldos" class="form-control" step="0.01" required value=0>
             </div>
         </div>
         <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
