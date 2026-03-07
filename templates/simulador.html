@@ -10,6 +10,7 @@
             <label>Ajuste de Margem:</label>
             <small class="text-muted d-block mb-1">altere o valor para usar margem livre ou diminuir com margem negativa, ex: -200</small>
             <input type="number" name="nova_parcela" id ="nova_parcela" class="form-control" step="0.01" required value="{{ nova_parcela if nova_parcela is defined }}" oninput="calcularParcelaTotal()">
+            <p>nova parcela = [{{nova_parcela}}]</p>
             <span id ="parcela_total"> Parcela total a Consignar: R$ {{ parcela_total if parcela_total is defined else "0,00"}} </span>
 
         </div>
