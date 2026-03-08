@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from logica.calculadora import OperacaoPortabilidade
+from services.calculadora import OperacaoPortabilidade
 from datetime import datetime,timedelta
 from decimal import Decimal
 
