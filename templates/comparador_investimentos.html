@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Comparador de Investimentos{% endblock %}
+
+{% block content %}
+<main class="container py-5 comparador-investimentos">
+    <style>
+        .comparador-investimentos .painel-configuracao,
+        .comparador-investimentos .investimento-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+        }
+
+        .comparador-investimentos .painel-configuracao .card-body,
+        .comparador-investimentos .investimento-card .card-body {
+            color: #f8fafc;
+        }
+
+        .comparador-investimentos .text-muted-custom {
+            color: #cbd5e1;
+        }
+
+        .comparador-investimentos .rentabilidades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .comparador-investimentos .rentabilidade-item {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+
+        .comparador-investimentos .rentabilidade-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .comparador-investimentos .rentabilidade-item input {
+            min-height: 46px;
+        }
+    </style>
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Comparador de Investimentos</h1>
+            <p class="text-muted-custom mb-0">
+                Monte os investimentos simulados e preencha manualmente a rentabilidade mensal para um futuro gráfico comparativo.
+            </p>
+        </div>
+        <span class="badge bg-primary fs-6">Prévia da base do gráfico</span>
+    </div>
+
+    <form id="comparador-investimentos-form">
+        <div class="card painel-configuracao shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="mes-inicial" class="form-label">Início da simulação</label>
+                        <input type="month" id="mes-inicial" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="mes-final" class="form-label">Fim da simulação</label>
+                        <input type="month" id="mes-final" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="quantidade-investimentos" class="form-label">Quantidade de investimentos</label>
+                        <input type="number" id="quantidade-investimentos" class="form-control" min="1" max="10" value="2" required>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <button type="button" class="btn btn-primary" onclick="gerarInvestimentos()">Gerar investimentos</button>
+                    <button type="button" class="btn btn-outline-light" onclick="limparComparador()">Limpar comparador</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resumo-periodo" class="alert alert-info d-none" role="status"></div>
+
+        <div id="investimentos-container" class="d-grid gap-4"></div>
+    </form>
+
+    <template id="investimento-template">
+        <section class="card shadow-sm investimento-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h2 class="h4 mb-1 titulo-investimento">Investimento</h2>
+                        <p class="text-muted-custom mb-0">Preencha os dados e a rentabilidade mês a mês.</p>
+                    </div>
+                    <span class="badge bg-secondary quantidade-meses">0 meses</span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-5">
+                        <label class="form-label">Nome do investimento</label>
+                        <input type="text" class="form-control investimento-nome" placeholder="Ex.: CDB Banco X" required>
+                    </div>
+                    <div class="col-lg-7">
+                        <span class="form-label d-block mb-2">Tributação</span>
+                        <div class="d-flex flex-wrap gap-3 tributacao-group">
+                            <div class="form-check">
+                                <input class="form-check-input tributacao-checkbox" type="checkbox" value="desconto_ir">
+                                <label class="form-check-label">Desconto de IR</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tributacao-checkbox" type="checkbox" value="come_cotas">
+                                <label class="form-check-label">Come-cotas</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tributacao-checkbox excludente" type="checkbox" value="no_resgate">
+                                <label class="form-check-label">No resgate</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tributacao-checkbox excludente" type="checkbox" value="sem_ir">
+                                <label class="form-check-label">Sem IR</label>
+                            </div>
+                        </div>
+                        <small class="text-muted-custom d-block mt-2">“No resgate” e “Sem IR” são excludentes para evitar combinações inválidas.</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h3 class="h5 mb-0">Rentabilidade mensal</h3>
+                    <span class="text-muted-custom small">Inputs amplos para facilitar o preenchimento manual.</span>
+                </div>
+
+                <div class="rentabilidades-grid rentabilidades-body"></div>
+            </div>
+        </section>
+    </template>
+</main>
+
+<script>
+function gerarMesesEntre(inicio, fim) {
+    const [anoInicio, mesInicio] = inicio.split('-').map(Number);
+    const [anoFim, mesFim] = fim.split('-').map(Number);
+    const cursor = new Date(anoInicio, mesInicio - 1, 1);
+    const limite = new Date(anoFim, mesFim - 1, 1);
+    const meses = [];
+
+    while (cursor <= limite) {
+        const ano = cursor.getFullYear();
+        const mes = String(cursor.getMonth() + 1).padStart(2, '0');
+        meses.push(`${ano}-${mes}`);
+        cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    return meses;
+}
+
+function formatarMes(valor) {
+    const [ano, mes] = valor.split('-');
+    return new Date(Number(ano), Number(mes) - 1, 1)
+        .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+}
+
+function atualizarResumo(meses, quantidade) {
+    const resumo = document.getElementById('resumo-periodo');
+    resumo.classList.remove('d-none');
+    resumo.textContent = `Período selecionado: ${meses.length} mês(es), com ${quantidade} investimento(s) para preenchimento manual.`;
+}
+
+function configurarTributacaoExcludente(card) {
+    const checkboxes = Array.from(card.querySelectorAll('.tributacao-checkbox'));
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+            if (!checkbox.checked) {
+                return;
+            }
+
+            const noResgate = card.querySelector('input[value="no_resgate"]');
+            const semIr = card.querySelector('input[value="sem_ir"]');
+
+            if (checkbox === noResgate && noResgate.checked) {
+                semIr.checked = false;
+            }
+
+            if (checkbox === semIr && semIr.checked) {
+                noResgate.checked = false;
+            }
+        });
+    });
+}
+
+function gerarInvestimentos() {
+    const inicio = document.getElementById('mes-inicial').value;
+    const fim = document.getElementById('mes-final').value;
+    const quantidade = Number(document.getElementById('quantidade-investimentos').value);
+    const container = document.getElementById('investimentos-container');
+
+    if (!inicio || !fim) {
+        alert('Preencha o início e o fim da simulação.');
+        return;
+    }
+
+    if (fim < inicio) {
+        alert('O fim da simulação deve ser igual ou posterior ao início.');
+        return;
+    }
+
+    if (!Number.isInteger(quantidade) || quantidade < 1) {
+        alert('Informe uma quantidade válida de investimentos.');
+        return;
+    }
+
+    const meses = gerarMesesEntre(inicio, fim);
+    container.innerHTML = '';
+
+    for (let indice = 1; indice <= quantidade; indice += 1) {
+        const template = document.getElementById('investimento-template');
+        const fragmento = template.content.cloneNode(true);
+        const card = fragmento.querySelector('.investimento-card');
+        const titulo = fragmento.querySelector('.titulo-investimento');
+        const contador = fragmento.querySelector('.quantidade-meses');
+        const campoNome = fragmento.querySelector('.investimento-nome');
+        const rentabilidades = fragmento.querySelector('.rentabilidades-body');
+
+        titulo.textContent = `Investimento ${indice}`;
+        contador.textContent = `${meses.length} mês(es)`;
+        campoNome.name = `investimento_${indice}_nome`;
+        campoNome.value = `Investimento ${indice}`;
+
+        meses.forEach((mesReferencia, posicao) => {
+            const item = document.createElement('div');
+            item.className = 'rentabilidade-item';
+            item.innerHTML = `
+                <label for="investimento_${indice}_mes_${posicao}">${formatarMes(mesReferencia)}</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="investimento_${indice}_mes_${posicao}"
+                    name="investimento_${indice}_rentabilidade_${mesReferencia}"
+                    placeholder="Digite a rentabilidade (%)"
+                >
+            `;
+            rentabilidades.appendChild(item);
+        });
+
+        configurarTributacaoExcludente(card);
+        container.appendChild(fragmento);
+    }
+
+    atualizarResumo(meses, quantidade);
+}
+
+function limparComparador() {
+    document.getElementById('comparador-investimentos-form').reset();
+    document.getElementById('investimentos-container').innerHTML = '';
+    const resumo = document.getElementById('resumo-periodo');
+    resumo.classList.add('d-none');
+    resumo.textContent = '';
+}
+</script>
+{% endblock %}

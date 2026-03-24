@@ -77,9 +77,9 @@ def simulador_portabilidade():
         carencia_padrao = carencia_padrao
     )
 
-@app.route('/simulador_investimentos', methods=['GET','POST'])
+@app.route('/simulador_investimentos', methods=['GET'])
 def simulador_investimentos():
-    return 'rota simulador de investimentos'
+    return render_template('comparador_investimentos.html')
 
 if __name__ == '__main__':
     app.run(host ="0.0.0.0", port=5000, debug=True)
