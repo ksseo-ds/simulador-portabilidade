@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for
 from services.calculadora import OperacaoPortabilidade
 from datetime import datetime,timedelta
 from decimal import Decimal
+from routes.investments_routes import investments_bp
 
 
 app = Flask(__name__)
+
+app.register_blueprint(investments_bp)
+
 
 @app.route('/')
 def index():

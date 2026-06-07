@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Investimentos{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/investments/investments.css') }}">
+</head>
+<body class="investments-main">
+
+  {% include "navigation.html" %}
+  <main class="investments-main">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>

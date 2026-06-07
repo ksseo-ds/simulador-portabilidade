@@ -1,0 +1,105 @@
+{% extends "investments/base_investments.html" %}
+
+{% block title %}Investimentos{% endblock %}
+
+{% block content %}
+
+<section class="investments-header">
+  <h1>Comparador de Investimentos</h1>
+  <p>Compare dois investimentos com base no prazo, valor inicial, rentabilidade esperada e imposto de renda.</p>
+</section>
+
+<section class="comparison-card">
+
+  <div class="general-data">
+    <h2>Dados gerais</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="valor_inicial">Valor inicial</label>
+        <input type="number" id="valor_inicial" name="valor_inicial" placeholder="Ex: 10000">
+      </div>
+
+      <div class="form-group">
+        <label for="tempo_aplicacao">Tempo da aplicação</label>
+        <input type="number" id="tempo_aplicacao" name="tempo_aplicacao" placeholder="Ex: 24">
+      </div>
+
+      <div class="form-group">
+        <label for="periodo">Período</label>
+        <select id="periodo" name="periodo">
+          <option value="meses">Meses</option>
+          <option value="anos">Anos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="investments-grid">
+
+    <div class="investment-box detailed">
+      <h2>Investimento detalhado</h2>
+
+      <div class="form-group">
+        <label for="nome_investimento">Nome do investimento</label>
+        <input type="text" id="nome_investimento" name="nome_investimento" placeholder="Ex: CDB Banco X">
+      </div>
+
+      <div class="form-group">
+        <label for="tipo_detalhado">Tipo</label>
+        <select id="tipo_detalhado" name="tipo_detalhado">
+          <option value="">Selecione</option>
+          <option value="cdb">CDB</option>
+          <option value="lci_lca">LCI/LCA</option>
+          <option value="tesouro">Tesouro Direto</option>
+          <option value="fundo">Fundo de Investimento</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="percentual_detalhado">% esperado</label>
+        <input type="number" id="percentual_detalhado" name="percentual_detalhado" placeholder="Ex: 110">
+      </div>
+
+      <div class="form-group">
+        <label for="ir_detalhado">Imposto de Renda</label>
+        <input type="number" id="ir_detalhado" name="ir_detalhado" placeholder="Ex: 15">
+      </div>
+    </div>
+
+    <div class="investment-box standard">
+      <h2>Investimento padrão</h2>
+
+      <div class="form-group">
+        <label for="tipo_padrao">Tipo</label>
+        <select id="tipo_padrao" name="tipo_padrao">
+          <option value="">Selecione</option>
+          <option value="poupanca">Poupança</option>
+          <option value="cdi">CDI</option>
+          <option value="selic">Selic</option>
+          <option value="ipca">IPCA</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="percentual_padrao">% esperado</label>
+        <input type="number" id="percentual_padrao" name="percentual_padrao" placeholder="Ex: 100">
+      </div>
+
+      <div class="form-group">
+        <label for="ir_padrao">Imposto de Renda</label>
+        <input type="number" id="ir_padrao" name="ir_padrao" placeholder="Ex: 15">
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="results-placeholder">
+  <h2>Dados a serem renderizados</h2>
+</section>
+
+{% endblock %}
