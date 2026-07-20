@@ -11265,3 +11265,7 @@ textarea.form-control-lg {
 }
 
 /*# sourceMappingURL=bootstrap.css.map */
+.checkbox-pcd {
+    transform: scale(2);
+    margin-right: 8px;
+}
