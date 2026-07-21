@@ -22,20 +22,16 @@ def simulador_portabilidade():
     dados_contratos=[]
     parcelas = []
     carencia_padrao = datetime.today().date() + timedelta(days=30)
-
-    if nova_parcela is not None:
-        parcela_total = nova_parcela + sum(parcelas)
-    else:
-        parcela_total = 0
+    parcela_total = Decimal('0.00')
 
     if request.method == 'POST':
         try:
             nomes_bancos = [n for n in request.form.getlist('nome_banco')]
             num_contratos = [n for n in request.form.getlist('num_contrato')]
             parcelas = [Decimal(p) for p in request.form.getlist('valor_parcelas')]
-            parcela_total = parcela_total 
             saldos = [Decimal(s) for s in request.form.getlist('saldos')]
             nova_parcela = Decimal(request.form.get('nova_parcela'))
+            parcela_total = nova_parcela + sum(parcelas, Decimal('0.00')) # inculi o Decumal para evitar de somar com listas vazias, estava dando erro 
             prazo = int(request.form.get('prazo'))
             juros = Decimal(request.form.get('juros'))
             data_pagamento_str = request.form.get('data_pagamento')
