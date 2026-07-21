@@ -40,18 +40,18 @@
     <div id="contratos">
         {% if dados_contratos %}
             {% for c in dados_contratos %}
-            <div class="contrato mb-3 border p-2 rounded">
+            <div class="contrato mb-4 border p-2 rounded">
                 <h5>Contrato</h5>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Numero do Contrato</label>
-                        <input type="text" name="num_contrato" class="form-control" value="{{ c.num_contrato }}">
+                        <input type="text" name="num_contrato" class="form-control" value="{{  c.num_contrato }}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Banco Nome</label>
                         <input type="text" name="nome_banco" class="form-control" value="{{ c.nome_banco }}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Parcela R$:</label>
                         <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value="{{ c.parcela }}" oninput="calcularParcelaTotal()">
                     </div>
@@ -59,29 +59,39 @@
                         <label>Saldo Devedor R$:</label>
                         <input type="number" name="saldos" class="form-control" step="0.01" required value="{{ c.saldo }}">
                     </div>
+            <!-- Essa div foi incluida apenas para calcular IOF adicional enquanto estão cobrando em duplicidade-->                
+                    <div class="col-md-3">
+                        <label>Operação de Portabilidade</label>
+                        <br> 
+                        <input type="checkbox" class="form-check-input" name="operacao_portada" value="{{ loop.index0 }}" {% if c.operacao_portada %} checked {% endif %} >
+                            
+                    <!-- endif  -->
+                        <br>
+                    </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
             </div>
             {% endfor %}
             <!-- Aqui entra no Else, essa parte é importante pra receber dados pra persistirem valores padrão antes da primeira simulação -->
         {% else %}
-        <div class="contrato mb-3 border p-2 rounded">
+        <div class="contrato mb-3 border p-3 rounded">
             <h5>Contrato</h5>
             <div class="row">
-<!--            <div class="col-md-3">
+                <div class="col-md-2">
                     <label>Numero do Contrato</label>
                     <input type="text" name="num_contrato" class="form-control">
                 </div>
--->
-                <div class="col-md-3">
+
+                <div class="col-md-2">
                     <label>Banco Nome</label>
                     <input type="text" name="nome_banco" class="form-control">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>Parcela R$:</label>
                     <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0 oninput="calcularParcelaTotal()">
                 </div>
                 <div class="col-md-3">
+
                     <label>Saldo Devedor R$:</label>
                     <input type="number" name="saldos" class="form-control" step="0.01" required value= 0>
                 </div>
@@ -89,9 +99,8 @@
                 <div class="col-md-3">
                     <label>Operação de Portabilidade</label>
                     <br> 
-                    <input type="checkbox" class="checkbox-pcd" name="operacao_portada" >
+                    <input type="checkbox" class="form-check-input" name="operacao_portada" >
                     <br>
-                    Check se essa operação é ou foi portabilizada
                 </div>
             </div>
             <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>
@@ -143,21 +152,28 @@ function adicionarContrato() {
     novo.innerHTML = `
         <h5>Contrato</h5>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Numero do Contrato</label>
                 <input type="text" name="num_contrato" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Banco Nome</label>
                 <input type="text" name="nome_banco" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Parcela R$:</label>
                 <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0>
             </div>
             <div class="col-md-3">
                 <label>Saldo Devedor R$:</label>
                 <input type="number" name="saldos" class="form-control" step="0.01" required value=0>
+            </div>
+    <!-- Essa div foi incluida apenas para calcular IOF adicional enquanto estão cobrando em duplicidade-->                
+            <div class="col-md-3">
+                <label>Operação de Portabilidade</label>
+                <br> 
+                <input type="checkbox" class="form-check-input" name="operacao_portada" >
+                <br>
             </div>
         </div>
         <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removerContrato(this)">Excluir Contrato</button>

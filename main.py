@@ -3,7 +3,7 @@ from services.calculadora import OperacaoPortabilidade
 from datetime import datetime,timedelta
 from decimal import Decimal
 from routes.investments_routes import investments_bp
-
+from services.iof import calcular_iof_adicional_portabilidade
 
 app = Flask(__name__)
 
@@ -40,8 +40,12 @@ def simulador_portabilidade():
             juros = Decimal(request.form.get('juros'))
             data_pagamento_str = request.form.get('data_pagamento')
             data_pagamento = datetime.strptime(data_pagamento_str, "%Y-%m-%d").date()
-
+            
+            indices_portados = {int(indice) for indice in request.form.getlist('operacao_portada')} # inclusão de informação para identificação de operações portadas para recalculo de IOF adicional
+            operacoes_portadas = [indice in indices_portados for indice in range(len(saldos))] # percore o set para identificar se na quantidade de saldos encotnrados o indice_portado se encontra entre esses saldos, isso serve para identificar as operações oriundas de portabilidaed
+          
             # cria a operação lá na Calculadora
+           
             operacao = OperacaoPortabilidade(
                 ajuste_margem=nova_parcela,
                 prazo=prazo,
@@ -51,17 +55,32 @@ def simulador_portabilidade():
                 parcelas=parcelas
             )
 
-            resultado = operacao.calcular_troco()
+            
             contratos = list(zip(parcelas, saldos)) # necessário para não apagar os dados preenchidos dos contratos adicionados
+            resultado_base = operacao.calcular_troco() # resultado com o IOF original e calculo de troco liquido, sem BITRIBUTAÇÃO
+           
             
-            
-            for banco, contrato, parcela, saldo in zip(nomes_bancos, num_contratos, parcelas, saldos ):
+            iof_adicional = round(calcular_iof_adicional_portabilidade(
+                prazo_meses = prazo,
+                saldos = saldos,
+                operacoes_portadas = operacoes_portadas),2)
+
+            resultado = {
+                **resultado_base,
+                "iof_original":resultado_base['iof'],
+                "iof_adicional":iof_adicional,
+                "iof": round(resultado_base['iof'] + iof_adicional,2),
+                "troco_liquido": round(resultado_base['troco_liquido'] - iof_adicional,2),
+            }
+
+            for banco, contrato, parcela, saldo, operacao_portada in zip(nomes_bancos, num_contratos, parcelas, saldos, operacoes_portadas ):
                 dados_contratos.append(
                     {
                         'nome_banco': banco,
                         'num_contrato': contrato,
                         'parcela':parcela,
-                        'saldo':saldo
+                        'saldo':saldo,
+                        'operacao_portada':operacao_portada
 
                     })
         except Exception as e:

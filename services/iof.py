@@ -1,4 +1,6 @@
 from decimal import Decimal
+from collections.abc import Sequence
+
 
 def calcular_iof(prazo_meses: int, valor_base: Decimal) -> Decimal:
     """
@@ -17,9 +19,34 @@ def calcular_iof(prazo_meses: int, valor_base: Decimal) -> Decimal:
     iof_coef = (ALIQ_DIARIA * Decimal(dias_totais))+ALIQ_FIXA
 
     iof = valor_base-(valor_base/(1+iof_coef))
-    print(iof_coef)
 
     return  iof
 #todo alterar o código do IOF para pegar um percentual do que seria o IOF em cima do valor base e recalcular o IOF final para esse percentual, isso evita da soma do IOF com o valor base superar o máximo.
 
 #todo Efetuar o calculo esperado de amortização de capital para calcular IOF decrescente
+
+def calcular_iof_adicional_portabilidade(
+    prazo_meses: int,
+    saldos: Sequence[Decimal],
+    operacoes_portadas: Sequence[bool],
+) -> Decimal:
+    """
+    Calcula o IOF adicional somente sobre os saldos das operações
+    identificadas como portabilidade.
+
+    Regra temporária enquanto houver cobrança adicional de IOF.
+    """
+    if len(saldos) != len(operacoes_portadas):
+        raise ValueError(
+            "A quantidade de saldos deve ser igual à quantidade "
+            "de identificadores de portabilidade."
+        )
+
+    return sum(
+        (
+            calcular_iof(prazo_meses, saldo)
+            for saldo, operacao_portada in zip(saldos, operacoes_portadas)
+            if operacao_portada
+        ),
+        Decimal("0"),
+    )
