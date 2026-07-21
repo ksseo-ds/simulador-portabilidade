@@ -12,7 +12,7 @@
         <div class="col-md-6">
             <label>Ajuste de Margem:</label>
             <small class="text-muted d-block mb-1">altere o valor para usar margem livre ou diminuir com margem negativa, ex: -200</small>
-            <input type="number" name="nova_parcela" id ="nova_parcela" class="form-control" step="0.01" required value="{{ nova_parcela if nova_parcela is not none else 0.00 }}" oninput="calcularParcelaTotal()">
+            <input type="text" name="nova_parcela" id ="nova_parcela" class="form-control" data-mascara-decimal step="0.01" required value="{{ nova_parcela if nova_parcela is not none else 0.00 }}" oninput="calcularParcelaTotal()">
             <span id ="parcela_total"> Parcela total a Consignar: R$ {{ parcela_total if parcela_total is not none else "0,00"}} </span>
 
         </div>
@@ -207,5 +207,20 @@ function calcularParcelaTotal(){
         "Parcela total a Consignar: R$ " + totalParcelas.toFixed(2);
 }
 
+document.addEventListener('input', function (event) {
+    const input = event.target;
+
+    if (!input.matches('[data-mascara-decimal]')) {
+        return;
+    }
+
+    const digitos = input.value.replace(/\D/g, '');
+    const valor = Number(digitos || 0) / 100;
+
+    input.value = valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+});
 </script>
 {% endblock %}
