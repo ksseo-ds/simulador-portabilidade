@@ -162,7 +162,7 @@ function adicionarContrato() {
             </div>
             <div class="col-md-2">
                 <label>Parcela R$:</label>
-                <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0>
+                <input type="number" name="valor_parcelas" class="form-control" step="0.01" required value=0 oninput="calcularParcelaTotal()">
             </div>
             <div class="col-md-3">
                 <label>Saldo Devedor R$:</label>
